@@ -1,2 +1,1 @@
-# Formacao_JavaScript_Back-End_Alura
-Formação JavaScript para back-end
+# Formação JavaScript Back-End Alura
