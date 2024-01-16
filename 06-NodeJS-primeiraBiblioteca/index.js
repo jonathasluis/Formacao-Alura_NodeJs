@@ -27,11 +27,19 @@ async function pegaArquivo(caminhoArquivo) {
     try {
         const encoding = 'UTF-8';
         const texto =  await fs.promises.readFile(caminhoArquivo, encoding)
-        console.log(chalk.green( texto));
+        console.log(pegaLinks(texto));
     } catch (erro) {
         trataErro(erro)
     }
-    
 }
 
-pegaArquivo('./arquivos/texto.md')
+function pegaLinks(texto) {
+    const regex = /\[([^[\]]*?)\]\((https?:\/\/[^\s?#.].[^\s]*)\)/gm;
+    const captura = [...texto.matchAll(regex)];
+    const resultado = captura.map(captura => ({[captura[1]] : [captura[2]]}))
+    return resultado
+}
+
+pegaArquivo('arquivos/texto.md');
+
+// \[([^[\]]*?)\]\((https?:\/\/[^\s?#.].[^\s]*)\)
