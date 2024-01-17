@@ -27,7 +27,7 @@ async function pegaArquivo(caminhoArquivo) {
     try {
         const encoding = 'UTF-8';
         const texto =  await fs.promises.readFile(caminhoArquivo, encoding)
-        console.log(pegaLinks(texto));
+        return pegaLinks(texto);
     } catch (erro) {
         trataErro(erro)
     }
@@ -37,9 +37,9 @@ function pegaLinks(texto) {
     const regex = /\[([^[\]]*?)\]\((https?:\/\/[^\s?#.].[^\s]*)\)/gm;
     const captura = [...texto.matchAll(regex)];
     const resultado = captura.map(captura => ({[captura[1]] : [captura[2]]}))
-    return resultado
+    return resultado.length > 0 ? resultado : chalk.red('Não tem link aqui!');
 }
 
-pegaArquivo('arquivos/texto.md');
+export default pegaArquivo;
 
 // \[([^[\]]*?)\]\((https?:\/\/[^\s?#.].[^\s]*)\)
