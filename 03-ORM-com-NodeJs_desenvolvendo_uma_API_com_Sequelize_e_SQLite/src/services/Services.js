@@ -1,13 +1,22 @@
-const dataSource = require('../models');
+const { or } = require('sequelize');
+const dataSource = require('../database/models');
 
 class Services {
     constructor(nomeDoModel) {
         this.nomeDoModel = nomeDoModel;
     }
 
-    async pegaTodosOsRegistros() {
+    async pegaTodosOsRegistros(where = {}) {
         try {
-            return dataSource[this.nomeDoModel].findAll();
+            return dataSource[this.nomeDoModel].findAll({ where: { ...where } });
+        } catch (error) {
+            return { error: error.message };
+        }
+    }
+
+    async pegaRegistrosPorEscopo(escopo) {
+        try {
+            return dataSource[this.nomeDoModel].scope(escopo).findAll();
         } catch (error) {
             return { error: error.message };
         }
@@ -15,7 +24,25 @@ class Services {
 
     async pegaUmRegistroPorId(id) {
         try {
-            return  dataSource[this.nomeDoModel].findByPk(id);
+            return dataSource[this.nomeDoModel].findByPk(id);
+        } catch (error) {
+            return { error: error.message };
+        }
+    }
+
+    async pegaUmRegistro(where) {
+        try {
+            return dataSource[this.nomeDoModel].findOne({ where: { ...where } });
+        } catch (error) {
+            return { error: error.message };
+        }
+    }
+
+    async pegaEContaRegistros(options) {
+        try {
+            return dataSource[this.nomeDoModel].findAndCountAll({
+                ...options
+            });
         } catch (error) {
             return { error: error.message };
         }
@@ -29,9 +56,13 @@ class Services {
         }
     }
 
-    async atualizaRegistro(dadosAtualizados, id) {
+    async atualizaRegistro(dadosAtualizados, where, transaction = {}) {
         try {
-            const listaDeRegistrosAtualizados = dataSource[this.nomeDoModel].update(dadosAtualizados, { where: { id: id } });
+            const listaDeRegistrosAtualizados = await dataSource[this.nomeDoModel]
+                .update(dadosAtualizados, {
+                    where: { ...where },
+                    transaction: transaction
+                });
             if (listaDeRegistrosAtualizados[0] === 0) {
                 return false;
             } else {
